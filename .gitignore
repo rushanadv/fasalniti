@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.sites-runtime/
+*.tsbuildinfo
+.DS_Store
+
+# Local Sites hosting identity
+.openai/
