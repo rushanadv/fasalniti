@@ -6,3 +6,7 @@ dist/
 
 # Local Sites hosting identity
 .openai/
+
+.env
+.env.*
+!.env.example

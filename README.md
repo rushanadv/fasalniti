@@ -1,40 +1,56 @@
 # FasalNiti
 
-A Hindi-first, bilingual React + TypeScript application for comparing produce selling options after costs. Built with Vite and React Router.
+Hindi-first produce marketplace with a separate buyer workspace, transparent take-home comparisons, immutable negotiation history, and a voice-first Ask section.
 
-## Run
+## Run locally
+
+Requires Node.js 22.12+.
 
 ```sh
-npm install
+npm ci
+cp .env.example .env.local
+# Add your own server-side credentials if enabling official mandi data or ElevenLabs.
 npm run dev
-npm test
-npm run build
 ```
 
-## Working demo
+Frontend: http://localhost:5173 · Backend: http://127.0.0.1:8787. The dev command runs both, proxies `/api` to the backend, and reloads backend source changes. Set the mandi key only as the server environment variable `DATA_GOV_IN_API_KEY`. No provider credential belongs in a `VITE_` or `NEXT_PUBLIC_` variable; keys must never be committed, returned to a browser, or logged. `.env` and `.env.local` are ignored by Git.
 
-Farmer home, four-step listing with saved progress, produce details, buyer offers, comparison with editable assumptions, immutable counteroffer history, confirmation before acceptance, and a separate buyer workspace. Use the labelled profile menu to switch roles, change language/location, or explore an empty account. All people, offers, locations and market quotes are fictional sample records. Ordinary records persist in localStorage; files remain session-only and are never uploaded or stored there.
+```sh
+npm run build
+npm test
+npm run check:client
+npm run check:integrations
+# Serve the production frontend and API from one local origin:
+npm start
+```
 
-The signature comparison uses 20 quintals of Grade A wheat available 18 November 2026. Option A returns ₹47,500; B returns ₹48,700, a ₹1,200 difference. Every other cost is explicitly zero. Mandi and an additional buyer demonstrate missing costs, which are never ranked as a complete best result. Comparison assumptions do not modify signed buyer proposals. Selection is restricted to the same listing and 20-quintal basis.
+Production output requires the Node backend. A static-only upload does not provide market, weather or speech APIs. Open http://127.0.0.1:8787 after `npm start`.
 
-## Boundaries
+## What works
 
-This is a browser-local commercial workflow demonstration. `src/domain/adapter.ts` provides an explicitly simulated acknowledgement, not a server. Offline submissions are blocked; drafts remain local. Loading the app for the first time offline and multi-device synchronization are not implemented. Publishing, offers and acceptance are demo-only and do not constitute transactions, payments, transport bookings or delivery confirmation.
+Home / Sell / Offers / Ask navigation; visual searchable crop selection; four-step listing drafts; buyer discovery and structured offers; preserved counteroffer proposals; exact-version acceptance summaries; unknown costs kept distinct from confirmed zero; Hindi/English text; numeric units and money; profile sharing controls and empty accounts. Comparison supports a selected listing and equal-quantity offers, normalizes kg/quintal/tonne, and retains the reproducible ₹47,500 versus ₹48,700 wheat example.
 
-Production requires authenticated farmer/buyer identities, server-side ownership and version checks, durable storage, secure document uploads and explicit sharing enforcement, real contact data, market/weather feeds, and agriculture assistance integrations. No OTP is sent. Optional farm-assistance and voice features honestly state that they are unavailable. No diagnosis or chemical advice is generated. Mandi quotes are stale fictional estimates, not executable offers. Exact farm coordinates are never collected. No fake verification is shown.
+Ask has consented microphone capture, labelled browser compatibility STT or a configurable ElevenLabs adapter, stop/cancel/error states, transcript editing, guarded question submission, visible source-grounded answers, spoken playback controls and opt-in autoplay. Question drafts persist locally; raw recordings do not. Optional Ask code is lazy-loaded. Real speech recognition still needs user-consented live audio testing; browser support is not universal.
 
-Uploads can be reviewed during the listing session. They intentionally do not appear as uploaded files after publication or reload; a real secure upload adapter is required. Contact/document switches record permission, but this demo has no real private contact information or persistent documents to disclose.
+Official market data flows frontend → backend → data.gov.in. The default AGMARKNET resource is verified. Alternate resources require contract verification and a matching `DATA_GOV_MANDI_VERIFIED_RESOURCE_ID`. Missing credentials show setup-required; fictional data is available only by explicitly choosing a labelled sample. Market reporting dates and fetch timestamps are separate. Unverified price units cannot enter selling calculations. Selling comparison has a separate reported market price calculator that requires the farmer’s quantity and costs.
 
-## Structure
+Open-Meteo supplies retrieved weather by supported district, with source, forecast dates, units, fetch time and an explicit unavailable issue timestamp. Weather and mandi outages do not disable marketplace routes. Ask explanations use retrieved records and deterministic offer calculations. An approved agronomy corpus is not connected, so farming questions ask for context and abstain from unsupported advice.
 
-- `src/components`: shell, accessible modal, receipt, crop illustrations and shared UI
-- `src/pages`: connected farmer and buyer journeys
-- `src/domain/model.ts`: integer-paise money calculations, conversions, and transitions
-- `src/domain/data.ts`: fictional fixtures and bilingual names/terms
-- `src/domain/adapter.ts`: replaceable mutation acknowledgement boundary
-- `src/i18n.ts`: Hindi/English UI strings
-- `src/store.tsx`: ordinary local persistence and UI state
+## Setup and verification boundaries
 
-## Checks
+See [integration contracts](docs/INTEGRATIONS.md) for the verified official references, units policy, filters, pagination, costs, retention configuration and remaining live acceptance gates. No API key was copied from a public repository or invented.
 
-Focused tests cover exact PRD money examples, zero versus unknown costs, best complete option, kg/quintal/tonne conversion, immutable proposal history, sender permissions, expiry and closed-state rules, and default contact/document visibility. Build checks TypeScript before bundling. Responsive CSS targets 360px, 390px, 768px and desktop.
+The marketplace is still a fictional browser-local demo: no real OTP, trade, payment, delivery booking or secure persistent upload is implemented. The live data.gov.in test passed using server-side credentials. Configured Hindi/English STT/TTS requires ElevenLabs credentials and real audio. The Node server binds loopback; multi-user hosting needs authentication and shared infrastructure.
+
+## Source structure
+
+- `src/pages`, `src/components`: connected, mobile-first journeys
+- `src/domain`: integer-paise calculations, conversions, transitions and demo data
+- `src/assistant`: grounded answer routing and pluggable speech boundary
+- `src/services`: typed API responses and client requests
+- `server/providers`: isolated market, weather and speech adapters
+- `server/http.ts`: bounded fetches, caches and rate limits
+- `src/i18n.ts`: Hindi/English strings
+- `scripts`: local startup and integration/artifact checks
+
+See [validation notes](VALIDATION.md) for automated and browser checks and their limits.
